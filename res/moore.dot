@@ -1,0 +1,12 @@
+﻿digraph MooreMachine {
+S0 [label = "S0/y0"]
+S1 [label = "S1/y1"]
+S2 [label = "S2/y0"]
+
+S0 -> S1 [label = "x1"]
+S0 -> S2 [label = "x2"]
+S1 -> S1 [label = "x1"]
+S1 -> S2 [label = "x2"]
+S2 -> S0 [label = "x1"]
+S2 -> S2 [label = "x2"]
+}
