@@ -6,8 +6,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(libs/FiniteAutomation)
+add_subdirectory(tests)
 add_executable(start main.cpp)
 target_link_libraries(start PRIVATE FiniteAutomation)
+
 
 include(FetchContent)
 FetchContent_Declare(
