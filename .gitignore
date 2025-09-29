@@ -1,6 +1,8 @@
 .idea/
 .vscode/
 cmake-build-*/
+.vs/
+cmake-build-debug-visual-studio/
 
 _deps/
 
