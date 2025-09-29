@@ -14,12 +14,14 @@ public:
 	using MooreOutputs = std::map<State, std::string>;
 
 	MooreMachine() = default;
-	explicit MooreMachine(State  initState);
+	explicit MooreMachine(State initState);
 	explicit MooreMachine(const MealyMachine& mealyMachine);
 
 	static MooreMachine FromDotFile(const std::string& name);
 	std::string ToDotString() const;
 	[[nodiscard]] std::string Print() const;
+
+	[[nodiscard]] MooreMachine Minimize() const;
 
 	[[nodiscard]] std::set<State> GetStates() const;
 	[[nodiscard]] State GetStartState() const;

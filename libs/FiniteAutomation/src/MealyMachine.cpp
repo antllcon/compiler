@@ -1,4 +1,4 @@
-#include "MealyMachine.h"
+﻿#include "MealyMachine.h"
 #include "MooreMachine.h"
 
 #include <algorithm>
@@ -22,6 +22,7 @@ constexpr size_t CELL_WIDTH = 12;
 
 using State = MealyMachine::State;
 using TransitionLabel = std::pair<std::string, std::string>;
+using Partition = std::vector<std::set<State>>;
 
 TransitionLabel ParseLabel(const std::string& label)
 {
@@ -98,6 +99,19 @@ void ParseDot(MealyMachine& machine, std::istream& input)
 			continue;
 		}
 	}
+}
+
+int FindGroupIndex(const Partition& partition, const State& state)
+{
+	for (size_t i = 0; i < partition.size(); ++i)
+	{
+		if (partition[i].contains(state))
+		{
+			return static_cast<int>(i);
+		}
+	}
+
+	return -1;
 }
 } // namespace
 
@@ -224,6 +238,125 @@ std::string MealyMachine::Print() const
 	}
 
 	return oss.str();
+}
+
+MealyMachine MealyMachine::Minimize() const
+{
+	if (m_states.empty())
+	{
+		return {};
+	}
+
+	std::set<std::string> inputs;
+	for (const auto& trans : m_transitions)
+	{
+		inputs.insert(trans.first.second);
+	}
+	std::vector<std::string> sortedInputs(inputs.begin(), inputs.end());
+
+	Partition partition;
+	{
+		std::map<std::map<std::string, std::string>, std::set<State>> groupsByOutput;
+		for (const auto& state : m_states)
+		{
+			std::map<std::string, std::string> outputSignature;
+			for (const auto& input : sortedInputs)
+			{
+				if (const auto it = m_transitions.find({state, input}); it != m_transitions.end())
+				{
+					outputSignature[input] = it->second.second;
+				}
+			}
+			groupsByOutput[outputSignature].insert(state);
+		}
+
+		for (const auto& pair : groupsByOutput)
+		{
+			if (!pair.second.empty())
+			{
+				partition.push_back(pair.second);
+			}
+		}
+	}
+
+	Partition prevPartition;
+	do
+	{
+		prevPartition = partition;
+		partition.clear();
+
+		for (const auto& group : prevPartition)
+		{
+			if (group.size() <= 1)
+			{
+				partition.push_back(group);
+				continue;
+			}
+
+			std::map<std::vector<int>, std::set<State>> newGroups;
+			for (const auto& state : group)
+			{
+				std::vector<int> transitionSignature;
+				for (const auto& input : sortedInputs)
+				{
+					if (const auto it = m_transitions.find({state, input}); it != m_transitions.end())
+					{
+						transitionSignature.push_back(FindGroupIndex(prevPartition, it->second.first));
+					}
+					else
+					{
+						transitionSignature.push_back(-1);
+					}
+				}
+				newGroups[transitionSignature].insert(state);
+			}
+
+			for (const auto& pair : newGroups)
+			{
+				partition.push_back(pair.second);
+			}
+		}
+
+		std::ranges::sort(partition, [](const auto& a, const auto& b) { return *a.begin() < *b.begin(); });
+
+	} while (partition.size() != prevPartition.size());
+
+	MealyMachine minimizedMachine;
+	std::map<State, State> oldStateToNewState;
+
+	for (const auto& group : partition)
+	{
+		State representative = *group.begin();
+		minimizedMachine.AddState(representative);
+
+		for (const auto& oldState : group)
+		{
+			oldStateToNewState[oldState] = representative;
+		}
+
+		if (group.contains(m_startState))
+		{
+			minimizedMachine.SetStartState(representative);
+		}
+	}
+
+	for (const auto& trans : m_transitions)
+	{
+		const State& fromOld = trans.first.first;
+		const std::string& input = trans.first.second;
+		const State& toOld = trans.second.first;
+		const std::string& output = trans.second.second;
+
+		const State& fromNew = oldStateToNewState.at(fromOld);
+		const State& toNew = oldStateToNewState.at(toOld);
+
+		if (!minimizedMachine.GetTransitions().contains({fromNew, input}))
+		{
+			minimizedMachine.SetTransition(fromNew, input, toNew, output);
+		}
+	}
+
+	return minimizedMachine;
 }
 
 std::set<State> MealyMachine::GetStates() const

@@ -21,6 +21,8 @@ constexpr size_t STATE_WIDTH = 12;
 constexpr size_t CELL_WIDTH = 12;
 
 using State = MooreMachine::State;
+using MooreState = MooreMachine::State;
+using Partition = std::vector<std::set<MooreState>>;
 
 std::string GetBaseStateName(const std::string& stateName, const std::set<std::string>& allOutputs)
 {
@@ -109,6 +111,18 @@ void ParseDotMoore(MooreMachine& machine, std::istream& input)
 			continue;
 		}
 	}
+}
+
+int FindGroupIndex(const Partition& partition, const MooreState& state)
+{
+	for (size_t i = 0; i < partition.size(); ++i)
+	{
+		if (partition[i].contains(state))
+		{
+			return static_cast<int>(i);
+		}
+	}
+	return -1; // Возвращаем -1, если состояние не найдено
 }
 } // namespace
 
@@ -327,4 +341,116 @@ void MooreMachine::SetStateOutput(const State& state, const std::string& output)
 		throw std::invalid_argument("State " + state + " is not in the machine");
 	}
 	m_outputs[state] = output;
+}
+
+MooreMachine MooreMachine::Minimize() const
+{
+	if (m_states.empty())
+	{
+		return {};
+	}
+
+	std::set<std::string> inputs;
+	for (const auto& trans : m_transitions)
+	{
+		inputs.insert(trans.first.second);
+	}
+
+	std::vector<std::string> sortedInputs(inputs.begin(), inputs.end());
+
+	Partition partition;
+	{
+		std::map<std::string, std::set<State>> groupsByOutput;
+		for (const auto& state : m_states)
+		{
+			groupsByOutput[m_outputs.at(state)].insert(state);
+		}
+
+		for (const auto& pair : groupsByOutput)
+		{
+			if (!pair.second.empty())
+			{
+				partition.push_back(pair.second);
+			}
+		}
+	}
+
+	Partition prevPartition;
+	do
+	{
+		prevPartition = partition;
+		partition.clear();
+
+		for (const auto& group : prevPartition)
+		{
+			if (group.size() <= 1)
+			{
+				partition.push_back(group);
+				continue;
+			}
+
+			std::map<std::vector<int>, std::set<State>> newGroups;
+			for (const auto& state : group)
+			{
+				std::vector<int> transitionSignature;
+				for (const auto& input : sortedInputs)
+				{
+					if (const auto it = m_transitions.find({state, input}); it != m_transitions.end())
+					{
+						transitionSignature.push_back(FindGroupIndex(prevPartition, it->second));
+					}
+					else
+					{
+						transitionSignature.push_back(-1);
+					}
+				}
+				newGroups[transitionSignature].insert(state);
+			}
+
+			for (const auto& pair : newGroups)
+			{
+				partition.push_back(pair.second);
+			}
+		}
+
+		std::ranges::sort(partition, [](const auto& a, const auto& b) { return *a.begin() < *b.begin(); });
+
+	} while (partition.size() != prevPartition.size());
+
+	MooreMachine minimizedMachine;
+	std::map<State, State> oldStateToNewState;
+
+	for (const auto& group : partition)
+	{
+		State representative = *group.begin();
+		const std::string& output = m_outputs.at(representative);
+		minimizedMachine.AddState(representative, output);
+
+		for (const auto& oldState : group)
+		{
+			oldStateToNewState[oldState] = representative;
+		}
+
+		if (group.contains(m_startState))
+		{
+			minimizedMachine.SetStartState(representative);
+		}
+	}
+
+	for (const auto& trans : m_transitions)
+	{
+		const State& fromOld = trans.first.first;
+		const std::string& input = trans.first.second;
+		const State& toOld = trans.second;
+
+		const State& fromNew = oldStateToNewState.at(fromOld);
+		const State& toNew = oldStateToNewState.at(toOld);
+
+		if (!minimizedMachine.GetTransitions().contains({fromNew, input}))
+		{
+			minimizedMachine.SetTransition(fromNew, input, toNew);
+		}
+	}
+
+	return minimizedMachine;
 }

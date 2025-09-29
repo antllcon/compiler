@@ -13,12 +13,14 @@ public:
 	using MealyTransitions = std::map<std::pair<State, std::string>, std::pair<State, std::string>>;
 
 	MealyMachine() = default;
-	explicit MealyMachine(State  initState);
+	explicit MealyMachine(State initState);
 	explicit MealyMachine(const MooreMachine& mooreMachine);
 
 	static MealyMachine FromDotFile(const std::string& name);
 	std::string ToDotString() const;
 	[[nodiscard]] std::string Print() const;
+
+	[[nodiscard]] MealyMachine Minimize() const;
 
 	[[nodiscard]] std::set<State> GetStates() const;
 	[[nodiscard]] State GetStartState() const;
