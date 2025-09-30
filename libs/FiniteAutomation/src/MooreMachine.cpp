@@ -122,7 +122,7 @@ int FindGroupIndex(const Partition& partition, const MooreState& state)
 			return static_cast<int>(i);
 		}
 	}
-	return -1; // Возвращаем -1, если состояние не найдено
+	return -1;
 }
 } // namespace
 

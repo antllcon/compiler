@@ -1,0 +1,30 @@
+{
+	"bmi-installation" : null,
+	"compiler-frontend-variant" : "MSVC",
+	"compiler-id" : "MSVC",
+	"compiler-simulate-id" : "",
+	"config" : "Debug",
+	"cxx-modules" : {},
+	"database-info" : null,
+	"dir-cur-bld" : "C:/Users/antllcon/source/repos/compiler/out/build/x64-debug",
+	"dir-cur-src" : "C:/Users/antllcon/source/repos/compiler",
+	"dir-top-bld" : "C:/Users/antllcon/source/repos/compiler/out/build/x64-debug",
+	"dir-top-src" : "C:/Users/antllcon/source/repos/compiler",
+	"exports" : [],
+	"forward-modules-from-target-dirs" : [],
+	"include-dirs" : 
+	[
+		"C:\\Users\\antllcon\\source\\repos\\compiler\\libs\\FiniteAutomation\\include"
+	],
+	"language" : "CXX",
+	"linked-target-dirs" : [],
+	"module-dir" : "C:/Users/antllcon/source/repos/compiler/out/build/x64-debug/CMakeFiles/start.dir",
+	"sources" : 
+	{
+		"CMakeFiles/start.dir/main.cpp.obj" : 
+		{
+			"language" : "CXX",
+			"source" : "C:/Users/antllcon/source/repos/compiler/main.cpp"
+		}
+	}
+}

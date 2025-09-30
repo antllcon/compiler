@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "CMakeFiles\\start.dir\\main.cpp.obj",
+            "outputs": [
+                "C:\\Users\\antllcon\\source\\repos\\compiler\\out\\build\\x64-debug\\vc140.pdb",
+                "CMakeFiles\\start.dir\\main.cpp.obj.ddi"
+            ],
+            "requires": []
+        }
+    ]
+}

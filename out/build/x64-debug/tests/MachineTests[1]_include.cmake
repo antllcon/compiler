@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/antllcon/source/repos/compiler/out/build/x64-debug/tests/MachineTests[1]_tests.cmake")
+  include("C:/Users/antllcon/source/repos/compiler/out/build/x64-debug/tests/MachineTests[1]_tests.cmake")
+else()
+  add_test(MachineTests_NOT_BUILT MachineTests_NOT_BUILT)
+endif()

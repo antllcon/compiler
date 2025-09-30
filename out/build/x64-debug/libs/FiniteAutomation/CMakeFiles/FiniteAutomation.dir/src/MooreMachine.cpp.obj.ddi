@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "libs\\FiniteAutomation\\CMakeFiles\\FiniteAutomation.dir\\src\\MooreMachine.cpp.obj",
+            "outputs": [
+                "C:\\Users\\antllcon\\source\\repos\\compiler\\out\\build\\x64-debug\\vc140.pdb",
+                "libs\\FiniteAutomation\\CMakeFiles\\FiniteAutomation.dir\\src\\MooreMachine.cpp.obj.ddi"
+            ],
+            "requires": []
+        }
+    ]
+}

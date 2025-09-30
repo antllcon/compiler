@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "tests\\CMakeFiles\\MachineTests.dir\\MachineTests.cpp.obj",
+            "outputs": [
+                "C:\\Users\\antllcon\\source\\repos\\compiler\\out\\build\\x64-debug\\vc140.pdb",
+                "tests\\CMakeFiles\\MachineTests.dir\\MachineTests.cpp.obj.ddi"
+            ],
+            "requires": []
+        }
+    ]
+}
